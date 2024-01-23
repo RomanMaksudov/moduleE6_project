@@ -38,7 +38,7 @@ class UserProfileDetailView(View):
 class EditProfileView(UpdateView):
     model = UserProfile
     form_class = UserProfileForm
-    template_name = 'edit_profile.html'
+    template_name = 'profile_edit.html'
     success_url = '/api/profile'
 
     def get_object(self, queryset=None):
@@ -93,7 +93,7 @@ class SendMessageView(View):
 
 @method_decorator(login_required, name='dispatch')
 class EditMessageView(View):
-    template_name = 'edit_message.html'
+    template_name = 'message_edit.html'
 
     def get(self, request, message_id):
         message = get_object_or_404(Message, id=message_id, sender=request.user.userprofile)
@@ -105,7 +105,7 @@ class EditMessageView(View):
         form = MessageForm(request.POST, instance=message)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('messenger_app:chat-with-user', args=[message.recipient.user.username]))
+            return HttpResponseRedirect(reverse('chat_api:chat-with-user', args=[message.recipient.user.username]))
         return render(request, self.template_name, {'form': form, 'message_id': message_id})
 
 
@@ -113,7 +113,7 @@ class EditMessageView(View):
 
 @method_decorator(login_required, name='dispatch')
 class DeleteMessageView(View):
-    template_name = 'delete_message.html'
+    template_name = 'message_delete.html'
 
     def get(self, request, message_id):
         message = get_object_or_404(Message, id=message_id, sender=request.user.userprofile)
@@ -124,7 +124,7 @@ class DeleteMessageView(View):
         message = get_object_or_404(Message, id=message_id, sender=request.user.userprofile)
         recipient_username = message.recipient.user.username
         message.delete()
-        return HttpResponseRedirect(reverse('messenger_app:chat-with-user', args=[recipient_username]))
+        return HttpResponseRedirect(reverse('chat_api:chat-with-user', args=[recipient_username]))
 
 
 # Отправка сообщения в групповой чат
@@ -222,7 +222,7 @@ class GroupChatCreateView(View):
 
             group_chat.members.add(request.user.userprofile, *form.cleaned_data['members'])
 
-            return JsonResponse({'status': 'success', 'redirect_url': reverse_lazy('messenger_app:group-chat-detail',
+            return JsonResponse({'status': 'success', 'redirect_url': reverse_lazy('chat_api:group-chat-detail',
                                                                                    kwargs={'pk': group_chat.id})})
 
         return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
@@ -236,7 +236,7 @@ class GroupChatDetailView(View):
 
     def get(self, request, pk):
         group_chat = Chat.objects.get(pk=pk)
-        send_group_message_url = reverse('messenger_app:send-group-message', kwargs={'chat_id': pk})
+        send_group_message_url = reverse('chat_api:send-group-message', kwargs={'chat_id': pk})
         form = MessageForm()
         return render(request, self.template_name,
                       {'group_chat': group_chat, 'send_group_message_url': send_group_message_url, 'form': form})
@@ -298,7 +298,7 @@ class ChatWithUserView(View):
         print("Sending a message...")
         print("Messages:", Message.objects.filter(chat=chat).order_by('timestamp'))
 
-        return HttpResponseRedirect(reverse('messenger_app:chat-with-user', args=[username]))
+        return HttpResponseRedirect(reverse('chat_api:chat-with-user', args=[username]))
 
 
 # ПОЛЬЗОВАТЕЛИ
@@ -336,7 +336,7 @@ class CustomLoginView(View):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('messenger_app:chat-list')
+            return redirect('chat_api:chat-list')
         return render(request, self.template_name, {'form': form})
 
 
@@ -354,5 +354,5 @@ class CustomRegisterView(View):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('messenger_app:chat-list')
+            return redirect('chat_api:chat-list')
         return render(request, self.template_name, {'form': form})
