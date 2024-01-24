@@ -1,4 +1,4 @@
-# messenger_app/urls.py
+# chat_api/urls.py
 from django.urls import path
 from .views import (
     UserListView,
@@ -9,7 +9,9 @@ from .views import (
     SendGroupMessageView,
 )
 
-app_name = 'messenger_app'
+
+app_name = 'chat_api'
+
 
 urlpatterns = [
     path('user-list/', UserListView.as_view(), name='user-list'),

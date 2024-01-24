@@ -1,0 +1,20 @@
+<!-- chat_api/templates/message_send.html -->
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block title %}Send message{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+  <div class="container">
+    <h2>Send message to {{ recipient.username }}</h2>
+    <form method="post">
+      {% csrf_token %}
+      <label for="content">Message:</label>
+      <textarea id="content" name="content" rows="4" cols="50" required></textarea>
+      <br>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+{% endblock %}

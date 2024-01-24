@@ -1,0 +1,18 @@
+<!-- templates/message_group_send.html -->
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block title %}Send group message{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+
+  <div class="container">
+    <h2>Sendgroup message</h2>
+    <form method="post" action="{% url 'chat_api:send-group-message' group_chat_id=group_chat.id %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Send message</button>
+    </form>
+  </div>
+{% endblock %}
